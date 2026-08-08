@@ -110,8 +110,8 @@
 
     <key type="b" name="hide-softwarecentre">
       <default>false</default>
-      <summary>Hide Software Center Option</summary>
-      <description>Hide the Software Center option in the Logo Menu.</description>
+      <summary>Hide Software Manager Option</summary>
+      <description>Hide the Software Manager option in the Logo Menu.</description>
     </key>
 
     <!-- External Apps -->
@@ -122,7 +122,7 @@
 
     <key type="s" name="menu-button-software-center">
       <default>"gnome-software"</default>
-      <summary>Software Center Application Command</summary>
+      <summary>Software Manager Application Command</summary>
     </key>
 
     <key type="s" name="menu-button-system-monitor">
@@ -137,33 +137,47 @@
 
     <key type="b" name="enable-panel-proximity">
       <default>true</default>
-      <summary>Enable Panel Proximity Coloring</summary>
+      <summary>Enable Panel Proximity Colouring</summary>
     </key>
 
     <key type="s" name="dark-bg-color">
       <default>'rgb(0, 0, 0)'</default>
-      <summary>Custom dark mode background color</summary>
+      <summary>Custom dark mode background colour</summary>
     </key>
 
     <key type="s" name="dark-fg-color">
       <default>'rgb(240, 240, 240)'</default>
-      <summary>Custom dark mode foreground color</summary>
+      <summary>Custom dark mode foreground colour</summary>
     </key>
 
     <key type="s" name="light-bg-color">
       <default>'rgb(250, 250, 250)'</default>
-      <summary>Custom light mode background color</summary>
+      <summary>Custom light mode background colour</summary>
     </key>
 
     <key type="s" name="light-fg-color">
       <default>'rgb(0, 0, 0)'</default>
-      <summary>Custom light mode foreground color</summary>
+      <summary>Custom light mode foreground colour</summary>
     </key>
+    
+    
+    <key type="b" name="show-app-menu-label">
+      <default>true</default>
+      <summary>Show App Menu Label</summary>
+      <description>Show or hide the active application name label in the top panel.</description>
+    </key>
+    
+    <key type="b" name="show-app-menu-icon">
+      <default>true</default>
+      <summary>Show App Menu Icon</summary>
+      <description>Show or hide the active application icon in the top panel.</description>
+    </key>
+
 
     <key type="b" name="colored-app-menu-icon">
       <default>false</default>
-      <summary>Colored App Menu Icon</summary>
-      <description>Show the active application icon in color rather than monochrome.</description>
+      <summary>Coloured App Menu Icon</summary>
+      <description>Show the active application icon in colour rather than monochrome.</description>
     </key>
 
 

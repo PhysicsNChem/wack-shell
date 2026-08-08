@@ -169,7 +169,7 @@ export default class WackShellPreferences extends ExtensionPreferences {
             icon_name: 'preferences-system-symbolic',
         });
 
-        // Group 2.1: Panel Objects
+       // Group 2.1: Panel Objects
         const visibilityGroup = new Adw.PreferencesGroup({
             title: 'Panel Objects',
         });
@@ -182,30 +182,55 @@ export default class WackShellPreferences extends ExtensionPreferences {
             'Display the logo menu button at the far left'
         ));
 
-        visibilityGroup.add(this._buildSwitchRow(
+        const showAppMenuRow = this._buildSwitchRow(
             settings,
             settingsSignalIds,
             'show-app-menu',
             'Show App Menu Button',
             'Display the focused application name next to the logo'
-        ));
+        );
+        visibilityGroup.add(showAppMenuRow);
 
+       
+        const showAppIconRow = this._buildSwitchRow(
+            settings,
+            settingsSignalIds,
+            'show-app-menu-icon',
+            'Show App Menu Icon',
+            'Display the application icon next to the application\'s name'
+        );
+        visibilityGroup.add(showAppIconRow);
+
+        
         const coloredAppIconRow = this._buildSwitchRow(
             settings,
             settingsSignalIds,
             'colored-app-menu-icon',
-            'Colored App Menu Icon',
-            'Display the application icon in color instead of monochrome'
+            'Coloured App Menu Icon',
+            'Display the application icon in colour instead of monochrome'
         );
         visibilityGroup.add(coloredAppIconRow);
 
-        const updateColoredAppIconSensitivity = () => {
-            coloredAppIconRow.sensitive = settings.get_boolean('show-app-menu');
-        };
-        const showAppMenuSig = settings.connect('changed::show-app-menu', updateColoredAppIconSensitivity);
-        settingsSignalIds.push(showAppMenuSig);
-        updateColoredAppIconSensitivity();
+        
 
+        // Grey out 'show-app-menu-icon' if 'show-app-menu' is false
+        const updateIconSensitivity = () => {
+            const hasAppMenu = settings.get_boolean('show-app-menu');
+            showAppIconRow.sensitive = hasAppMenu;
+            
+            const hasAppIcon = settings.get_boolean('show-app-menu-icon');
+            coloredAppIconRow.sensitive = hasAppMenu && hasAppIcon;
+        };
+
+      
+        const sigAppMenu = settings.connect('changed::show-app-menu', updateIconSensitivity);
+        const sigAppIcon = settings.connect('changed::show-app-menu-icon', updateIconSensitivity);
+        settingsSignalIds.push(sigAppMenu, sigAppIcon);
+
+        // Set initial states
+        updateIconSensitivity();
+
+        // 4. Show Workspace Widget Toggle
         visibilityGroup.add(this._buildSwitchRow(
             settings,
             settingsSignalIds,
@@ -613,7 +638,7 @@ export default class WackShellPreferences extends ExtensionPreferences {
             settingsSignalIds,
             'enable-panel-proximity',
             'Enable/Disable Proximity',
-            'Automatically switch panel opacity/color when windows are maximised or close to the panel.'
+            'Automatically switch panel opacity/colour when windows are maximised or close to the panel.'
         ));
 
         // Dark Mode Colors Expander
@@ -658,7 +683,7 @@ export default class WackShellPreferences extends ExtensionPreferences {
             settingsSignalIds,
             'symbolic-logo',
             'Use Symbolic Icon',
-            'Toggle symbolic (monochrome) vs colored style'
+            'Toggle symbolic (monochrome) vs coloured style'
         ));
 
         logoOptionsGroup.add(this._buildSwitchRow(
