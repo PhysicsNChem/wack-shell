@@ -11,7 +11,7 @@ This is a part of the WACK project (WACK Ain't Cupertino, Kid), a collection of 
   Adds a customizable logo button to the far left of the panel — pick from 34 pre-defined distro icons (Apple, Fedora, Arch, and more), use symbolic or colored variants, or supply your own SVG/PNG. Add an optional text label beside it. Clicking opens a macOS-style system menu with quick access to About My System, System Settings, App Grid, Software Center, System Monitor, Terminal, Extensions, Force Quit App, and optionally power controls (Sleep, Restart, Shut Down, Log Out, Lock Screen). Each launcher command is user-configurable, and individual menu items can be shown or hidden. Left- and middle-click actions are independently configurable: open the menu or toggle the Overview. <br><br>
 
 - **App Menu** <br>
-  Shows the focused application's name and icon next to the logo, macOS menu-bar style. Fades in and out smoothly on focus change and overview toggle. Icon can be displayed in symbolic or full color. <br><br>
+  Shows the focused application's name and (optionally) icon next to the logo, macOS menu-bar style. Fades in and out smoothly on focus change and overview toggle. Icon can be displayed in symbolic or full color. <br><br>
 
 - **Workspace Widget** <br>
   A separate widget placed next to the logo — choose between animated workspace dot indicators (à la GNOME 45 lock screen) or a classic Activities label. The label variant optionally appends the current workspace number (e.g. *Activities • 2*). Scroll over either widget to switch workspaces, with an optional workspace switcher HUD popup. <br><br>
@@ -40,7 +40,7 @@ Running `make install` again is sufficient to update — it syncs the directory 
 
 ## Compatibility
 
-Developed and tested on GNOME 46 and 49 (Fedora/Nobara). GNOME 47–48 are untested but should work fine. Open an issue if you run into something, or clone and contribute.
+Developed and tested on GNOME 46, 49 and 50 (Fedora/Nobara). GNOME 47–48 are untested but should work fine. Open an issue if you run into something, or clone and contribute.
 
 ## About the WACK Project
 
