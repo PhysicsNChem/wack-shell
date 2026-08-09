@@ -71,12 +71,14 @@ export default class WackShellExtension extends Extension {
         this._sessionModeOwner = {};
         Main.sessionMode.connectObject('updated', () => this._syncSessionModeUI(), this._sessionModeOwner);
 
-        this._settings.connectObject(
-            'changed::show-logo-menu', () => this._syncLogoMenu(),
-            'changed::show-workspace-widget', () => this._syncWorkspaceWidget(),
-            'changed::show-app-menu', () => this._syncAppMenu(),
-            this
-        );
+this._settings.connectObject(
+    'changed::show-logo-menu', () => this._syncLogoMenu(),
+    'changed::show-workspace-widget', () => this._syncWorkspaceWidget(),
+    'changed::show-app-menu', () => this._syncAppMenu(),
+    'changed::show-app-menu-icon', () => this._appMenuButton?._updateAppMenuVisibility(),
+    'changed::show-app-menu-label', () => this._appMenuButton?._updateAppMenuVisibility(),
+    this
+);
 
         this._syncLogoMenu();
         this._syncWorkspaceWidget();

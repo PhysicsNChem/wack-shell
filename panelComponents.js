@@ -548,7 +548,8 @@ export const WackAppMenuButton = GObject.registerClass({
         this.bind_property('reactive', this, 'can-focus', 0);
         this.reactive = false;
 
-        this._container = new St.BoxLayout({ style_class: 'panel-status-menu-box' });
+        this._container = new St.BoxLayout({ style_class: 'panel-status-menu-box' , y_align: Clutter.ActorAlign.CENTER,
+        });
         bin.set_child(this._container);
 
         this._desaturateEffect = new Clutter.DesaturateEffect();
@@ -560,8 +561,8 @@ export const WackAppMenuButton = GObject.registerClass({
         this._container.add_child(this._iconBox);
 
         this._label = new St.Label({
-            y_expand: true,
             y_align: Clutter.ActorAlign.CENTER,
+            
         });
         this._container.add_child(this._label);
 
@@ -585,10 +586,15 @@ export const WackAppMenuButton = GObject.registerClass({
         global.window_manager.connectObject('switch-workspace',
             this._sync.bind(this), this);
 
-        this._settings.connectObject('changed::colored-app-menu-icon',
-            this._updateIconEffect.bind(this), this);
+        this._settings.connectObject(
+    'changed::colored-app-menu-icon',       this._updateIconEffect.bind(this),
+    'changed::show-app-menu-icon', this._updateAppMenuVisibility.bind(this),
+    'changed::show-app-menu-label', this._updateAppMenuVisibility.bind(this),
+    this
+);
 
         this._updateIconEffect();
+        this._updateAppMenuVisibility();
         this._sync(true);
     }
 
@@ -760,6 +766,24 @@ export const WackAppMenuButton = GObject.registerClass({
             this._iconBox.style = 'margin-right: 4px; -st-icon-style: symbolic';
         }
     }
+    
+    _updateAppMenuVisibility() {
+    const showIcon = this._settings.get_boolean('show-app-menu-icon');
+    const showLabel = this._settings.get_boolean('show-app-menu-label');
+
+    if (showIcon) {
+        this._iconBox.show();
+    } else {
+        this._iconBox.hide();
+    }
+
+    if (showLabel) {
+        this._label.show();
+    } else {
+        this._label.hide();
+    }
+}
+
 
     destroy() {
         this._targetApp?.disconnectObject(this);
@@ -778,6 +802,8 @@ export const WackAppMenuButton = GObject.registerClass({
         super.destroy();
     }
 });
+
+
 
 export const WackWorkspaceButton = GObject.registerClass(
     class WackWorkspaceButton extends PanelMenu.Button {
