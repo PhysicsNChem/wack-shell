@@ -8,7 +8,7 @@ This is a part of the WACK project (WACK Ain't Cupertino, Kid), a collection of 
 ## Features
 
 - **Companion Extension to WACK - Sonoma Lockscreen** <br>
-  Provides Unlock Crossfade: WACK Shell captures window snapshots before lock, which Sonoma Lockscreen fades back in on unlock when the option is enabled.
+  Provides Unlock Crossfade: WACK Shell captures window snapshots before lock, which Sonoma Lockscreen fades back in on unlock when the option is enabled. <br><br>
 
 - **Logo Button & System Menu** <br>
   Adds a customizable logo button to the far left of the panel — pick from 34 pre-defined distro icons (Apple, Fedora, Arch, and more), use symbolic or colored variants, or supply your own SVG/PNG. Add an optional text label beside it. Clicking opens a macOS-style system menu with quick access to About My System, System Settings, App Grid, Software Center, System Monitor, Terminal, Extensions, Force Quit App, and optionally power controls (Sleep, Restart, Shut Down, Log Out, Lock Screen). Each launcher command is user-configurable, and individual menu items can be shown or hidden. Left- and middle-click actions are independently configurable: open the menu or toggle the Overview. <br><br>
