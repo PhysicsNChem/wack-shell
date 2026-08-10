@@ -98,14 +98,14 @@
     <!-- Menu Item Switches -->
     <key type="b" name="show-power-options">
       <default>true</default>
-      <summary>Show Power Options</summary>
-      <description>Show Sleep, Restart, Shut Down options in the Logo Menu.</description>
+      <summary>Show Power and Session Options</summary>
+      <description>Show Sleep, Restart, Shut Down, Lock Screen, Switch User, and Log Out options in the Logo Menu.</description>
     </key>
 
-    <key type="b" name="show-lockscreen">
+    <key type="b" name="hide-qs-power-options">
       <default>true</default>
-      <summary>Show Lock Screen Option</summary>
-      <description>Show Lock Screen option in the Logo Menu.</description>
+      <summary>Hide Quick Settings Power Options</summary>
+      <description>Hide power and lock buttons from Quick Settings menu when Logo Menu power and session controls are enabled.</description>
     </key>
 
     <key type="b" name="hide-softwarecentre">
