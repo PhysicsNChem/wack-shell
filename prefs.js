@@ -756,17 +756,29 @@ export default class WackShellPreferences extends ExtensionPreferences {
             settings,
             settingsSignalIds,
             'show-power-options',
-            'Show Power Options',
-            'Display Sleep, Restart, and Shut Down options'
+            'Show Power and Session Options',
+            'Display Sleep, Restart, Shut Down, Lock Screen, Switch User, and Log Out options'
         ));
 
-        menuItemsGroup.add(this._buildSwitchRow(
+        const hideQsPowerRow = this._buildSwitchRow(
             settings,
             settingsSignalIds,
-            'show-lockscreen',
-            'Show Lock Screen',
-            'Display the Lock Screen option'
-        ));
+            'hide-qs-power-options',
+            'Hide Quick Settings Power Buttons',
+            'Hide power and lock buttons from Quick Settings when Logo Menu power and session options are active'
+        );
+        menuItemsGroup.add(hideQsPowerRow);
+
+        const updateQsPowerSensitivity = () => {
+            const showLogo = settings.get_boolean('show-logo-menu');
+            const showPower = settings.get_boolean('show-power-options');
+            hideQsPowerRow.sensitive = showLogo && showPower;
+        };
+
+        const sigLogo = settings.connect('changed::show-logo-menu', updateQsPowerSensitivity);
+        const sigPower = settings.connect('changed::show-power-options', updateQsPowerSensitivity);
+        settingsSignalIds.push(sigLogo, sigPower);
+        updateQsPowerSensitivity();
 
         menuItemsGroup.add(this._buildSwitchRow(
             settings,

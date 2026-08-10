@@ -12,7 +12,8 @@ import { Extension, gettext as _ } from 'resource:///org/gnome/shell/extensions/
 import {
     WackLogoButton,
     WackAppMenuButton,
-    WackWorkspaceButton
+    WackWorkspaceButton,
+    QuickSettingsPowerManager
 } from './panelComponents.js';
 import VibrancyManager from './vibrancyManager.js';
 import { APP_GRID_WORKSPACE_RATIO, APP_GRID_WORKSPACE_FADE_RANGE, APP_GRID_WORKSPACE_FADE_SNAP } from './constants.js';
@@ -86,6 +87,9 @@ export default class WackShellExtension extends Extension {
         // Initialize and enable VibrancyManager
         this._vibrancyManager = new VibrancyManager(this, this._settings);
         this._vibrancyManager.enable();
+
+        // Initialize QuickSettings power controls manager
+        this._qsPowerManager = new QuickSettingsPowerManager(this);
 
         this._windowSnapshotCachingEnabled = true;
         this._lockscreenSettings = null;
@@ -200,6 +204,11 @@ export default class WackShellExtension extends Extension {
         if (this._vibrancyManager) {
             this._vibrancyManager.disable();
             this._vibrancyManager = null;
+        }
+
+        if (this._qsPowerManager) {
+            this._qsPowerManager.destroy();
+            this._qsPowerManager = null;
         }
 
         if (this._activeSelection) {
@@ -475,6 +484,8 @@ if (global.wackDockSnapshots) {
         if (this._appMenuButton) {
             this._appMenuButton._sync(true);
         }
+
+        this._qsPowerManager?.sync();
 
         // Ensure windows are reset to full opacity and scale when transitioning from locked to unlocked
         if (hasWindows && this._lastHasWindows === false) {

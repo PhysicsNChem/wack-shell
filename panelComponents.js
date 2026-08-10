@@ -451,39 +451,36 @@ export const WackLogoButton = GObject.registerClass(
 
 
 
-            // 5. System Power controls
+            // 5. System Power and Session controls
             const showPower = this._settings.get_boolean('show-power-options');
-            const showLock = this._settings.get_boolean('show-lockscreen');
 
-            if (showPower || showLock) {
+            if (showPower) {
                 this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
-                if (showPower) {
-                    this.menu.addMenuItem(new LogoMenuItem(_('Sleep'), () => {
-                        SystemActions.getDefault().activateSuspend();
-                    }));
-                    this.menu.addMenuItem(new LogoMenuItem(_('Restart...'), () => {
-                        SystemActions.getDefault().activateRestart();
-                    }));
-                    this.menu.addMenuItem(new LogoMenuItem(_('Shut Down...'), () => {
-                        SystemActions.getDefault().activatePowerOff();
-                    }));
-                }
+                // Power controls
+                this.menu.addMenuItem(new LogoMenuItem(_('Sleep'), () => {
+                    SystemActions.getDefault().activateSuspend();
+                }));
+                this.menu.addMenuItem(new LogoMenuItem(_('Restart...'), () => {
+                    SystemActions.getDefault().activateRestart();
+                }));
+                this.menu.addMenuItem(new LogoMenuItem(_('Shut Down...'), () => {
+                    SystemActions.getDefault().activatePowerOff();
+                }));
 
-                if (showLock) {
-                    if (showPower) {
-                        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-                    }
-                    this.menu.addMenuItem(new LogoMenuItem(_('Lock Screen'), () => {
-                        SystemActions.getDefault().activateLockScreen();
-                    }));
-                }
+                // Separator line between Power and Session options
+                this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
-                if (showPower) {
-                    this.menu.addMenuItem(new LogoMenuItem(_('Log Out...'), () => {
-                        SystemActions.getDefault().activateLogout();
-                    }));
-                }
+                // Session controls
+                this.menu.addMenuItem(new LogoMenuItem(_('Lock Screen'), () => {
+                    SystemActions.getDefault().activateLockScreen();
+                }));
+                this.menu.addMenuItem(new LogoMenuItem(_('Switch User...'), () => {
+                    SystemActions.getDefault().activateSwitchUser();
+                }));
+                this.menu.addMenuItem(new LogoMenuItem(_('Log Out...'), () => {
+                    SystemActions.getDefault().activateLogout();
+                }));
             }
         }
 
@@ -968,3 +965,154 @@ export const WackWorkspaceButton = GObject.registerClass(
             super.destroy();
         }
     });
+
+export class QuickSettingsPowerManager {
+    constructor(extension) {
+        this._extension = extension;
+        this._settings = extension._settings;
+
+        this._settings.connectObject(
+            'changed::show-logo-menu', () => this.sync(),
+            'changed::show-power-options', () => this.sync(),
+            'changed::hide-qs-power-options', () => this.sync(),
+            this
+        );
+
+        Main.sessionMode.connectObject(
+            'updated', () => this.sync(),
+            this
+        );
+
+        if (Main.screenShield) {
+            Main.screenShield.connectObject(
+                'active-changed', () => this.sync(),
+                this
+            );
+        }
+
+        this.sync();
+    }
+
+    _isLockscreen() {
+        const currentMode = Main.sessionMode.currentMode;
+        if (currentMode === 'unlock-dialog' || currentMode === 'greeter' || currentMode === 'gdm')
+            return true;
+        if (Main.sessionMode.isLocked)
+            return true;
+        if (Main.screenShield) {
+            if (Main.screenShield.active)
+                return true;
+            if (typeof Main.screenShield.isLocked === 'function' && Main.screenShield.isLocked())
+                return true;
+        }
+        return false;
+    }
+
+    _isLockItem(item) {
+        const typeName = item.constructor.name || '';
+        if (typeName === 'LockItem')
+            return true;
+        if (item._action === 'lock' || item.action === 'lock')
+            return true;
+        const accessibleName = item.accessible_name || (typeof item.get_accessible_name === 'function' ? item.get_accessible_name() : '');
+        if (typeof accessibleName === 'string' && accessibleName.toLowerCase().includes('lock'))
+            return true;
+        return false;
+    }
+
+    _getPowerItems() {
+        try {
+            const systemIndicator = Main.panel.statusArea.quickSettings?._system;
+            const systemItem = systemIndicator?._systemItem;
+            const boxLayout = systemItem?.child;
+            if (!boxLayout)
+                return [];
+
+            const children = boxLayout.get_children();
+            return children.filter(c => {
+                const typeName = c.constructor.name || '';
+                return typeName === 'LockItem' || typeName === 'ShutdownItem' ||
+                       c._systemActions !== undefined || c.menu !== undefined;
+            });
+        } catch (e) {
+            console.error('WACK Shell: Failed to locate Quick Settings power items', e);
+            return [];
+        }
+    }
+
+    sync() {
+        const isLockscreen = this._isLockscreen();
+        const showLogoMenu = this._settings.get_boolean('show-logo-menu');
+        const showPowerOptions = this._settings.get_boolean('show-power-options');
+        const hideQsPowerOptions = this._settings.get_boolean('hide-qs-power-options');
+
+        const shouldHideAllQsPower = showLogoMenu && showPowerOptions && hideQsPowerOptions;
+
+        const powerItems = this._getPowerItems();
+        powerItems.forEach(item => {
+            const isLock = this._isLockItem(item);
+
+            let shouldHideItem = false;
+            if (isLockscreen) {
+                // On lockscreen: lock button makes no sense so hide it, but show power options (shutdown/restart/suspend)
+                shouldHideItem = isLock;
+            } else {
+                // On desktop: hide all QS power controls if option to hide QS power options is active
+                shouldHideItem = shouldHideAllQsPower;
+            }
+
+            if (shouldHideItem) {
+                if (!item._wackSignalId) {
+                    item._wackSignalId = item.connect('notify::visible', () => {
+                        if (item._wackHiding && item.visible) {
+                            item.visible = false;
+                        }
+                    });
+                }
+                if (item._sync && !item._wackOriginalSync) {
+                    item._wackOriginalSync = item._sync;
+                    item._sync = () => { item.visible = false; };
+                }
+                item._wackHiding = true;
+                item.visible = false;
+            } else {
+                item._wackHiding = false;
+                if (item._wackOriginalSync) {
+                    item._sync = item._wackOriginalSync;
+                    delete item._wackOriginalSync;
+                }
+                if (item._wackSignalId) {
+                    item.disconnect(item._wackSignalId);
+                    delete item._wackSignalId;
+                }
+                if (item._sync)
+                    item._sync();
+                else
+                    item.visible = true;
+            }
+        });
+    }
+
+    destroy() {
+        this._settings?.disconnectObject(this);
+        Main.sessionMode?.disconnectObject(this);
+        Main.screenShield?.disconnectObject(this);
+
+        const powerItems = this._getPowerItems();
+        powerItems.forEach(item => {
+            item._wackHiding = false;
+            if (item._wackOriginalSync) {
+                item._sync = item._wackOriginalSync;
+                delete item._wackOriginalSync;
+            }
+            if (item._wackSignalId) {
+                item.disconnect(item._wackSignalId);
+                delete item._wackSignalId;
+            }
+            if (item._sync)
+                item._sync();
+            else
+                item.visible = true;
+        });
+    }
+}
