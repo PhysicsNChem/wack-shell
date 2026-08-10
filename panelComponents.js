@@ -747,6 +747,7 @@ export const WackAppMenuButton = GObject.registerClass({
                 this._targetApp.get_busy());
 
         this.reactive = visible && !isBusy;
+        this.sync_hover(); //after an app is focused, this ensures the appmenu is not being hovered over without the cursor over it
 
         this.menu.setApp(this._targetApp);
         this.emit('changed');
