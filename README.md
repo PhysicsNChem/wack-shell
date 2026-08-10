@@ -7,7 +7,7 @@ This is a part of the WACK project (WACK Ain't Cupertino, Kid), a collection of 
 
 ## Features
 
-- **Companion Extension to WACK - Sonoma Lockscreen ** <br>
+- **Companion Extension to WACK - Sonoma Lockscreen** <br>
   Provides Unlock Crossfade: WACK Shell captures window snapshots before lock, which Sonoma Lockscreen fades back in on unlock when the option is enabled.
 
 - **Logo Button & System Menu** <br>
