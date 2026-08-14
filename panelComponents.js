@@ -601,7 +601,7 @@ export const WackAppMenuButton = GObject.registerClass({
 
         this._visible = true;
         this.show();
-        this.reactive = true;
+        //this.reactive = true;
         if (this.container) {
             this.container.opacity = 255;
             this.container.reactive = true;
